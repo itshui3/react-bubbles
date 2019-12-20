@@ -11,6 +11,7 @@ const ColorList = ({ colors, updateColors }) => {
   console.log(colors, 'colors', colors.length, 'length');
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [colorToAdd, setColorToAdd] = useState(initialColor);
 
   const editColor = color => {
     setEditing(true);
@@ -27,8 +28,6 @@ const ColorList = ({ colors, updateColors }) => {
     })
 
     const index = colors.indexOf(item)
-
-    console.log(item, 'item', index, 'index of item')
 
     const newColors 
       = colors.slice(0, index)
@@ -68,6 +67,19 @@ const ColorList = ({ colors, updateColors }) => {
         console.log(err)
       })
   };
+
+  const addColor = ev => {
+    ev.preventDefault()
+    if(colorToAdd.code.hex && colorToAdd.color) {
+      axiosWithAuth().post(`/colors/`, colorToAdd)
+      .then( res => {
+        console.log(res)
+      })
+      .catch( err => {
+        console.log(err)
+      })
+    }
+  }
 
   return (
     <div className="colors-wrap">
@@ -122,8 +134,36 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
-      <div className="spacer" />
+
       {/* stretch - build another form here to add a color */}
+      <form onSubmit={addColor}>
+          <legend>add color</legend>
+          <label>
+            color name:
+            <input
+              onChange={e =>
+                setColorToAdd({ ...colorToAdd, color: e.target.value })
+              }
+              value={colorToAdd.color}
+            />
+          </label>
+          <label>
+            hex code:
+            <input
+              onChange={e =>
+                setColorToAdd({
+                  ...colorToAdd,
+                  code: { hex: e.target.value }
+                })
+              }
+              value={colorToAdd.code.hex}
+            />
+          </label>
+          <div className="button-row">
+            <button type="submit">save</button>
+            
+          </div>
+        </form>
     </div>
   );
 };
